@@ -1,0 +1,10 @@
+env.CAST_BRANCH                           = "master"
+env.APPLICATION_DESTINATION_DIRECTORY     = "application-code"
+env.CASTAIPCONSOLE_URL			          		= "https://cast-aip.sec-gt.com"
+env.CASTAIPCONSOLE_APPLICATION_NAME      	= "ps-webportal-fe"
+env.CAST_TQI_URL                          = "http://cast-aip.sec-gt.com/castdashboard/rest/AAD/results?quality-indicators=60017&snapshots=-1&applications=${CASTAIPCONSOLE_APPLICATION_NAME}"
+//env.CASTAIPCONSOLE_APIKEY	       	      	= "AfMqFnJk.UqjSA6lRm2fYAIxxNemAPF6oWloGP0bq"
+env.CASTAIPCONSOLE_APIKEY	       	      	= "DESNyBtb.ydRafBAgh6GHEAb8uWmqLRX0jgcrEj2K"
+env.CAST_TOOLS_GIT_URL 			          		= "https://gitlab.globetel.com/devops-chapter/rnd/cast-software-tools/cast-aip-console-tools-cli.git"
+env.GITLAB_CREDENTIAL			         				= "sacodedeployer" 
+env.CAST_TQI_BASELINE			         				= 1

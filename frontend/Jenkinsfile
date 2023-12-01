@@ -1,0 +1,239 @@
+pipeline {
+    agent { label 'jenkins-worker-pmtor' }
+    environment {
+        SONAR_LOGIN                = credentials('janus-sonar-ce-token')
+        SONAR_PROJECT_KEY          ='ps-web-portal-fe'
+        ACCESS_TOKEN               = credentials('dmagsipoc_jfrog_token_2')
+
+
+        //-----------------insert dev ssh pass here---------------------
+        //PS_DEVELOPMENT_KEY       = credentials('ps-dev-pass')
+        PS_DEV_KEY         = credentials('ps-develop-pass') 
+        PS_STAGING_KEY             = credentials('ps-staging-pass')
+        PS_PREPRD_WEB_FE_KEY       = credentials('ps-preprod-web-fe-pass')
+        PS_PROD_WEB_FE_KEY         = credentials('ps-prod-web-fe-pass')
+
+        APP                     = "web-portal-fe"
+        DEVELOPMENT_REACT_ENV   = credentials('ps-develop-react-env')
+        TEST_REACT_ENV          = credentials('ps-test-react-env') 
+        PREPROD_REACT_ENV       = credentials('ps-preprod-react-env')
+        //PRODUCTION_REACT_ENV    = credentials('ps-production-react-env')
+        PROD_REACT_ENV    = credentials('ps-prod-react-env')
+
+        
+        
+        // Prisma ENV
+        PRISMA_CONSOLE          = "https://asia-northeast1.cloud.twistlock.com/anz-3050922"
+         //Add TCOE Jenkins Job Parameters
+        TCOE_JENKINS_JOB_URL    = "https://jenkins.tcoedevicefarm.com:8443/job/Tcoe_PaymentServices"
+        TCOE_JENKINS_USERNAME   = "payment_services_globe"
+        TCOE_JENKINS_TOKEN      = "11f6bbb5171b029a8ba898e15ab1737c76"
+        ///SECRET                  = ""
+    }
+
+    stages {
+        // Make every scripts in pipeline-scripts folder executable
+        stage('Prepare Necessary files') { 
+            steps {
+                load "env.groovy" 
+                sh 'chmod +x -R pipeline-scripts'
+            }
+        }
+        stage('Build') {
+            when  { anyOf {
+                // branch 'codescan'
+                branch 'develop'
+                branch 'testbed'
+                branch 'pre-prod'
+                branch 'master'
+                branch 'feature-preprod'
+                branch 'feature-testbed'
+                branch 'feature-develop'
+                branch 'feature-prod'
+                
+            }}
+            steps { sh 'pipeline-scripts/01-build.sh' }
+        } 
+        stage('Unit Test') {
+            when  { anyOf {
+                branch 'codescan'
+                // branch 'develop'
+                // branch 'testbed'
+                // branch 'pre-prod'
+                // branch 'master'
+                // branch 'feature-preprod'
+                // branch 'feature-testbed'
+                // branch 'feature-develop'
+            }} 
+            steps { sh 'pipeline-scripts/02-unit-test.sh' }
+        }
+
+        // stage('Sonar Scan'){
+        //     when  { anyOf {
+        //         branch 'codescan'
+        //         branch 'develop'
+        //         branch 'testbed'
+        //         branch 'pre-prod'
+        //         branch 'master'
+        //         branch 'feature-preprod'
+        //         branch 'feature-testbed'
+        //         branch 'feature-develop'
+        //     }}
+        //     steps {
+        //         sh 'pipeline-scripts/03-sonar-scan.sh'
+        //     }
+        // }
+
+        // perform prisma serverless scan
+        // stage('Prisma serverless Scan') {
+        //     when {anyOf{
+        //           branch 'codescan'
+        //           branch 'develop'
+        //           branch 'testbed'
+        //           branch 'pre-prod'
+        //           branch 'master'
+        //           branch 'feature-preprod'
+        //           branch 'feature-testbed'
+        //           branch 'feature-develop'
+        //     }}
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'janus-prisma-prod-token', passwordVariable: 'PRISMA_PASS', usernameVariable: 'PRISMA_USER')]) {
+        //             sh 'pipeline-scripts/04-prisma-scan.sh'
+        //         }                
+        //     }
+        // }
+
+        
+        // stage("CAST AIP Execution") {
+        //     when  { anyOf {
+        //         branch 'codescan'
+        //         branch 'develop'
+        //         branch 'testbed'
+        //         branch 'pre-prod'
+        //         branch 'master'
+        //         branch 'feature-preprod'
+        //         branch 'feature-testbed'
+        //         branch 'feature-develop'
+        //     }} 
+        //     steps {
+        //         dir('cast-aip-console-tools-cli') {
+        //             sh 'echo "pulling cast-aip-console-tools-cli"'
+        //             git url: "$CAST_TOOLS_GIT_URL",
+        //             branch: "$CAST_BRANCH",
+        //             credentialsId: "$GITLAB_CREDENTIAL"
+        //         }
+		// 		sh 'echo CAST TQI URL: ${CAST_TQI_URL}'
+		// 		sh 'sudo chmod +x -R ./cast-aip-console-tools-cli/aip-console-tools-cli.jar'
+        //         withCredentials([usernamePassword(credentialsId: 'cast-aip-api-login', usernameVariable: 'CAST_API_USERNAME', passwordVariable: 'CAST_API_PASSWORD')]) {
+        //             sh 'pipeline-scripts/05-cast-aip.sh'
+        //         }
+        //     }
+        // }
+        
+        stage('Upload Artifact') {
+            when  { anyOf {
+                //branch 'codescan'
+                branch 'develop'
+                branch 'testbed'
+                branch 'pre-prod'
+                branch 'master'
+                branch 'feature-preprod'
+                branch 'feature-testbed'
+                branch 'feature-develop'
+                branch 'feature-prod'
+            }}
+            steps { sh './pipeline-scripts/06-upload-to-artifactory.sh' }
+        }
+
+        stage('Deploy to Dev'){ 
+            when  { anyOf {
+                branch 'codescan'
+                branch 'develop'
+                branch 'feature-develop'
+
+            }}
+            steps { 
+                sh './pipeline-scripts/07-deploy-dev.sh' 
+            }
+        }
+
+        stage('Deploy to Testbed'){ 
+            when  { anyOf {
+                branch 'codescan'
+                branch 'testbed'
+                branch 'feature-testbed'
+
+            }}
+            steps { 
+                sh './pipeline-scripts/08-deploy-test.sh' 
+            }
+        }
+
+        stage('Deploy to Preprod'){ 
+            when  { anyOf {
+                branch 'codescan'
+                branch 'pre-prod'
+                //branch 'feature-preprod'
+
+            }}
+            steps { 
+                sh './pipeline-scripts/09-deploy-preprd.sh' 
+            }
+        }
+
+        stage('Deploy to Prod'){ 
+            when  { anyOf {
+                //branch 'codescan'
+                branch 'master'
+                //branch 'feature-prod'
+
+            }}
+            steps { 
+                sh './pipeline-scripts/10-deploy-prod.sh' 
+            }
+        }
+
+        // // Perform after Deployment Testing (Functional, Non Functional, UAT)
+        // stage('Post Deployment Test') {
+        //    when { anyOf {
+        //         branch 'develop'
+        //         branch 'testbed'
+        //         branch 'pre-prod'
+        //         branch 'master'
+        //         branch 'feature-preprod'
+        //         branch 'feature-testbed'
+        //         branch 'feature-develop'
+           
+        //    }}
+		//     steps {
+		// 		sh "pipeline-scripts/11-post-deployment.sh"
+		// 	}
+        // }
+
+        // stage('GChat Notif'){
+        //     when {anyOf {
+        //         branch 'develop'
+        //         branch 'testbed'
+        //         branch 'pre-prod'
+        //         branch 'master'
+        //         branch 'feature-preprod'
+        //         branch 'feature-testbed'
+        //         branch 'feature-develop'
+        //         branch 'feature-prod'
+        //     }}
+        //     steps {
+        //         build job: "../gchat-notif-freestyle"
+        //     }
+        // }
+        
+    
+    }
+        // What to do after build?
+    post { 
+        always { 
+            sh 'echo "Cleaning workspace..."'
+            cleanWs()
+            sh 'echo "Done..."'
+        }
+    }
+}
