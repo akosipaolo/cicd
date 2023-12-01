@@ -1,34 +1,34 @@
 pipeline {
-    agent { label 'jenkins-worker-pmtor' }
+    agent { label 'CICD' }
     environment {
-        SONAR_LOGIN                = credentials('janus-sonar-ce-token')
-        SONAR_PROJECT_KEY          ='ps-web-portal-fe'
-        ACCESS_TOKEN               = credentials('dmagsipoc_jfrog_token_2')
+        // SONAR_LOGIN                = credentials('janus-sonar-ce-token')
+        // SONAR_PROJECT_KEY          ='ps-web-portal-fe'
+        // ACCESS_TOKEN               = credentials('dmagsipoc_jfrog_token_2')
 
 
-        //-----------------insert dev ssh pass here---------------------
-        //PS_DEVELOPMENT_KEY       = credentials('ps-dev-pass')
-        PS_DEV_KEY         = credentials('ps-develop-pass') 
-        PS_STAGING_KEY             = credentials('ps-staging-pass')
-        PS_PREPRD_WEB_FE_KEY       = credentials('ps-preprod-web-fe-pass')
-        PS_PROD_WEB_FE_KEY         = credentials('ps-prod-web-fe-pass')
+        // // //-----------------insert dev ssh pass here---------------------
+        // // //PS_DEVELOPMENT_KEY       = credentials('ps-dev-pass')
+        // // PS_DEV_KEY         = credentials('ps-develop-pass') 
+        // // PS_STAGING_KEY             = credentials('ps-staging-pass')
+        // // PS_PREPRD_WEB_FE_KEY       = credentials('ps-preprod-web-fe-pass')
+        // // PS_PROD_WEB_FE_KEY         = credentials('ps-prod-web-fe-pass')
 
-        APP                     = "web-portal-fe"
-        DEVELOPMENT_REACT_ENV   = credentials('ps-develop-react-env')
-        TEST_REACT_ENV          = credentials('ps-test-react-env') 
-        PREPROD_REACT_ENV       = credentials('ps-preprod-react-env')
-        //PRODUCTION_REACT_ENV    = credentials('ps-production-react-env')
-        PROD_REACT_ENV    = credentials('ps-prod-react-env')
+        // APP                     = "web-portal-fe"
+        // DEVELOPMENT_REACT_ENV   = credentials('ps-develop-react-env')
+        // TEST_REACT_ENV          = credentials('ps-test-react-env') 
+        // PREPROD_REACT_ENV       = credentials('ps-preprod-react-env')
+        // //PRODUCTION_REACT_ENV    = credentials('ps-production-react-env')
+        // PROD_REACT_ENV    = credentials('ps-prod-react-env')
 
         
         
-        // Prisma ENV
-        PRISMA_CONSOLE          = "https://asia-northeast1.cloud.twistlock.com/anz-3050922"
-         //Add TCOE Jenkins Job Parameters
-        TCOE_JENKINS_JOB_URL    = "https://jenkins.tcoedevicefarm.com:8443/job/Tcoe_PaymentServices"
-        TCOE_JENKINS_USERNAME   = "payment_services_globe"
-        TCOE_JENKINS_TOKEN      = "11f6bbb5171b029a8ba898e15ab1737c76"
-        ///SECRET                  = ""
+        // // Prisma ENV
+        // PRISMA_CONSOLE          = "https://asia-northeast1.cloud.twistlock.com/anz-3050922"
+        //  //Add TCOE Jenkins Job Parameters
+        // TCOE_JENKINS_JOB_URL    = "https://jenkins.tcoedevicefarm.com:8443/job/Tcoe_PaymentServices"
+        // TCOE_JENKINS_USERNAME   = "payment_services_globe"
+        // TCOE_JENKINS_TOKEN      = "11f6bbb5171b029a8ba898e15ab1737c76"
+        // ///SECRET                  = ""
     }
 
     stages {
